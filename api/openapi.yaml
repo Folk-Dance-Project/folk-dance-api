@@ -1,0 +1,413 @@
+openapi: 3.0.3
+info:
+  title: Test Service
+  description: This is a test service
+  version: 1.0.0
+servers:
+  - url: /1.0
+tags:
+  - name: Auth
+  - name: Groups
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      description: Register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterBody'
+      responses:
+        200:
+          description: API Key
+          content:
+            appication/json:
+              schema:
+                $ref: '#/components/schemas/TokenResult'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+      operationId: register
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      description: Log in
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginBody'
+      responses:
+        200:
+          description: API Key
+          content:
+            appication/json:
+              schema:
+                $ref: '#/components/schemas/TokenResult'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+      operationId: login
+  /groups:
+    get:
+      tags:
+        - Groups
+      description: Get a list of folk dance groups
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: name
+          in: query
+          required: false
+          schema:
+            type: string
+            nullable: true
+            default: null
+      responses:
+        200:
+          description: Lit of dance groups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupList'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+      operationId: getGroups
+      security:
+        - ApiKeyAuth: [ ]
+    post:
+      tags:
+        - Groups
+      description: Create a dance group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupBody'
+      responses:
+        200:
+          description: Created Group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupListItem'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+      security:
+        - ApiKeyAuth: [ ]
+      operationId: createGroup
+  /groups/{groupId}/members:
+    get:
+      tags:
+        - Groups
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        200:
+          description: A list of group members
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberList'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+      security:
+        - ApiKeyAuth: [ ]
+      operationId: getGroupMembers
+  /groups/{groupId}/membership-requests:
+    get:
+      tags:
+        - Groups
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        200:
+          description: A list of group membership requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MemberList'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+      security:
+        - ApiKeyAuth: [ ]
+      operationId: getMembershipRequests
+    put:
+      tags:
+        - Groups
+      description: Request to be a member of a group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: The group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupListItem'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+      security:
+        - ApiKeyAuth: [ ]
+      operationId: requestMembership
+    patch:
+      tags:
+        - Groups
+      description: Accept or deny a membership request
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMemberBody'
+      responses:
+        200:
+          description: The group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupListItem'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+      security:
+        - ApiKeyAuth: [ ]
+      operationId: updateMembershipRequest
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      description: Authenticate users based on a Bearer token
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    GroupListItem:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - membersCount
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        membersCount:
+          type: integer
+    GroupList:
+      type: object
+      additionalProperties: false
+      required:
+        - total
+        - groups
+      properties:
+        total:
+          type: integer
+        groups:
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupListItem'
+    CreateGroupBody:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    MemberListItem:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - email
+        - role
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum:
+            - admin
+            - member
+    MemberList:
+      type: object
+      additionalProperties: false
+      required:
+        - total
+        - members
+      properties:
+        total:
+          type: integer
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/MemberListItem'
+    UpdateMemberBody:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+        - role
+        - userId
+      properties:
+        userId:
+          type: integer
+        status:
+          type: string
+          enum:
+            - accepted
+            - pending
+            - denied
+        role:
+          type: string
+          enum:
+            - member
+            - admin
+          default: member
+    APIError:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 404
+        message:
+          type: string
+    RegisterBody:
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - password
+        - name
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        groudId:
+          type: number
+          nullable: true
+          default: null
+    LoginBody:
+      type: object
+      additionalProperties: false
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    TokenResult:
+      type: object
+      additionalProperties: false
+      required:
+        - token
+      properties:
+        token:
+          type: string
+
+
+
+
+
+
