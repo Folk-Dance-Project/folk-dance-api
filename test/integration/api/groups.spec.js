@@ -50,4 +50,16 @@ describe("Groups API", () => {
             expect(result.body.total).toBeGreaterThan(0);
         });
     });
+
+    describe("PUT /1.0/groups/{groupId}/membership-requests", () => {
+        test("response should match openApi schema", async () => {
+            const group2 = await models.Groups.create({ name: "test group2" });
+            const result = await api
+                .put(`/1.0/groups/${group2.id}/membership-requests`)
+                .set("Authorization", "Bearer asd");
+
+            expect(result.body).toSatisfySchemaInApiSpec("GroupListItem");
+            expect(result.status).toBe(200);
+        });
+    });
 });
