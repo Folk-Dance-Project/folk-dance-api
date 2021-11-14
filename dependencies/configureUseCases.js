@@ -7,6 +7,7 @@ const Login = require("../use-cases/auth/Login");
 const GetGroups = require("../use-cases/groups/GetGroups");
 const CreateGroup = require("../use-cases/groups/CreateGroup");
 const GetGroupMembers = require("../use-cases/groups/GetGroupMembers");
+const GetMembershipRequests = require("../use-cases/groups/GetMembershipRequests");
 const RequestMembership = require("../use-cases/groups/RequestMembership");
 
 function configureUseCases({ models, services }) {
@@ -15,6 +16,7 @@ function configureUseCases({ models, services }) {
     const getGroups = GetGroups({ models });
     const createGroup = CreateGroup({ models });
     const getGroupMembers = GetGroupMembers({ models });
+    const getMembershipRequests = GetMembershipRequests({ models });
     const requestMembership = RequestMembership({ models });
 
     return {
@@ -23,6 +25,7 @@ function configureUseCases({ models, services }) {
         getGroups,
         createGroup,
         getGroupMembers,
+        getMembershipRequests,
         requestMembership,
     };
 }

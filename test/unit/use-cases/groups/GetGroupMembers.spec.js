@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const models = require("../../mocks/models");
 const GetGroupMembers = require("../../../../use-cases/groups/GetGroupMembers");
 const { NotFoundError } = require("../../../../common/errors");
@@ -39,14 +40,18 @@ describe("GetGroupMembers", () => {
         expect(group.countMembers).toHaveBeenCalledWith(
             expect.objectContaining({
                 through: expect.objectContaining({
-                    where: expect.objectContaining({ status: GROUP_MEMBERSHIP_STATUS.APPROVED }),
+                    where: expect.objectContaining({
+                        status: { [Op.not]: GROUP_MEMBERSHIP_STATUS.PENDING },
+                    }),
                 }),
             })
         );
         expect(group.getMembers).toHaveBeenCalledWith(
             expect.objectContaining({
                 through: expect.objectContaining({
-                    where: expect.objectContaining({ status: GROUP_MEMBERSHIP_STATUS.APPROVED }),
+                    where: expect.objectContaining({
+                        status: { [Op.not]: GROUP_MEMBERSHIP_STATUS.PENDING },
+                    }),
                 }),
             })
         );

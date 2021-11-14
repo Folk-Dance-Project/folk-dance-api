@@ -62,4 +62,22 @@ describe("Groups API", () => {
             expect(result.status).toBe(200);
         });
     });
+    describe("GET /1.0/groups/{groupId}/membership-requests", () => {
+        test("response should match openApi schema", async () => {
+            const group3 = await models.Groups.create({ name: "test group2" });
+            await group3.addMember(1, {
+                through: {
+                    role: GROUP_MEMBERSHIP_ROLES.MEMBER,
+                    status: GROUP_MEMBERSHIP_STATUS.PENDING,
+                },
+            });
+            const result = await api
+                .get(`/1.0/groups/${group3.id}/membership-requests`)
+                .set("Authorization", "Bearer asd");
+
+            expect(result.body).toSatisfySchemaInApiSpec("MemberList");
+            expect(result.status).toBe(200);
+            expect(result.body.members.length).toBeGreaterThan(0);
+        });
+    });
 });

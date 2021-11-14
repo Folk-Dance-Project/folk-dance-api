@@ -1,9 +1,8 @@
-const { Op } = require("sequelize");
 const { NotFoundError } = require("../../common/errors");
 const { GROUP_MEMBERSHIP_STATUS } = require("../../common/constants");
 
-function GetGroupMembers({ models }) {
-    return async function getGroupMembers({ params: { groupId, offset = 0, limit = 100 } }) {
+function GetMembershipRequests({ models }) {
+    return async function getMembershipRequests({ params: { groupId, offset = 0, limit = 100 } }) {
         const group = await models.Groups.findByPk(groupId);
         if (!group) {
             throw new NotFoundError("Group not found");
@@ -12,9 +11,7 @@ function GetGroupMembers({ models }) {
         const query = {
             through: {
                 where: {
-                    status: {
-                        [Op.not]: GROUP_MEMBERSHIP_STATUS.PENDING,
-                    },
+                    status: GROUP_MEMBERSHIP_STATUS.PENDING,
                 },
             },
         };
@@ -35,4 +32,4 @@ function GetGroupMembers({ models }) {
     };
 }
 
-module.exports = GetGroupMembers;
+module.exports = GetMembershipRequests;
