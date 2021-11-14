@@ -21,7 +21,9 @@ describe("CreateGroup", () => {
         const data = {
             name: "group",
         };
-        models.Groups.create.mockReturnValueOnce({ id: 1, name: data.name, membersCount: 1 });
+        const group = { id: 1, name: data.name, membersCount: 1 };
+        group.addMember = jest.fn();
+        models.Groups.create.mockReturnValueOnce(group);
 
         await createGroup({ data, user });
 
@@ -34,14 +36,19 @@ describe("CreateGroup", () => {
         const data = {
             name: "group",
         };
-        models.Groups.create.mockReturnValueOnce({ id: 1, name: data.name, membersCount: 1 });
+        const group = { id: 1, name: data.name, membersCount: 1 };
+        group.addMember = jest.fn();
+        models.Groups.create.mockReturnValueOnce(group);
 
         await createGroup({ data, user });
 
-        expect(models.GroupMemberships.create).toHaveBeenCalledWith(
+        expect(group.addMember).toHaveBeenCalledWith(
+            user.id,
             expect.objectContaining({
-                role: GROUP_MEMBERSHIP_ROLES.ADMIN,
-                status: GROUP_MEMBERSHIP_STATUS.APPROVED,
+                through: expect.objectContaining({
+                    role: GROUP_MEMBERSHIP_ROLES.ADMIN,
+                    status: GROUP_MEMBERSHIP_STATUS.APPROVED,
+                }),
             })
         );
     });

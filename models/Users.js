@@ -39,7 +39,7 @@ class Users extends Model {
     }
 
     static associate({ Groups, GroupMemberships }) {
-        Users.belongsToMany(Groups, { through: GroupMemberships });
+        Users.belongsToMany(Groups, { through: GroupMemberships, as: "memberships" });
     }
 }
 module.exports = Users;

@@ -6,10 +6,6 @@ const {
 } = require("../setup");
 
 describe("Auth API", () => {
-    beforeAll(async () => {
-        await sequelize.sync();
-    });
-
     afterEach(async () => {
         await sequelize.truncate();
     });

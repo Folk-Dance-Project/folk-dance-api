@@ -18,3 +18,7 @@ module.exports.port = parseEnvNumber("PORT", 3000);
 module.exports.jwt = {
     secret: process.env.JWT_SECRET || "supersecret",
 };
+
+module.exports.general = {
+    isTesting: process.env.NODE_ENV === "test",
+};

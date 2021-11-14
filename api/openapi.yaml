@@ -162,6 +162,7 @@ paths:
       security:
         - ApiKeyAuth: [ ]
       operationId: getGroupMembers
+      x-check-group-role: [ member ]
   /groups/{groupId}/membership-requests:
     get:
       tags:
@@ -200,6 +201,7 @@ paths:
       security:
         - ApiKeyAuth: [ ]
       operationId: getMembershipRequests
+      x-check-group-role: [ admin ]
     put:
       tags:
         - Groups
@@ -258,7 +260,7 @@ paths:
       security:
         - ApiKeyAuth: [ ]
       operationId: updateMembershipRequest
-
+      x-check-group-role: [ admin ]
 components:
   securitySchemes:
     ApiKeyAuth:

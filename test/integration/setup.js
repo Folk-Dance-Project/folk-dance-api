@@ -17,12 +17,23 @@ const dependencies = require("../../dependencies");
 
 const { services, models } = dependencies;
 
-services.jwt.decodeToken.mockReturnValue({ id: 1 });
-
 const oasDoc = jsyaml.load(fs.readFileSync("api/openapi.yaml", "utf8"));
 jestOpenAPI(oasDoc);
 
 const app = new Application({ dependencies });
 const api = supertest(app.expressApp);
 
-module.exports = { api, models, services };
+async function initUser(
+    data = { name: "abel", email: "abel@example.com", password: "asd", apiKeyVersion: 1 }
+) {
+    const user = await models.Users.create(data);
+    services.jwt.decodeToken.mockReturnValue({ id: user.id, apiKeyVersion: 1 });
+
+    return user;
+}
+
+beforeAll(async () => {
+    await models.sequelize.sync();
+});
+
+module.exports = { api, models, services, initUser };

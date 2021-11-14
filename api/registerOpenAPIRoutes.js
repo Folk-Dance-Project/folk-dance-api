@@ -1,8 +1,26 @@
 const OpenApiValidator = require("express-openapi-validator");
 const swaggerWebUi = require("swagger-ui-express");
 const express = require("express");
+const config = require("../config");
+const { OPENAPI_X_CHECK_GROUP_ROLE } = require("../common/constants");
 
 const EXPRESS_HTTP_METHODS = ["get", "put", "post", "delete", "options", "head", "patch"];
+
+/**
+ * @param {string} path
+ */
+function mapPathToExpress(path) {
+    const parts = path.split("/");
+    for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        if (part.startsWith("{") && part.endsWith("}")) {
+            // replace braces
+            parts[i] = `:${part.slice(1, part.length - 1)}`;
+        }
+    }
+
+    return parts.join("/");
+}
 
 /**
  * Extract parameters from Express request object based on openApi spec
@@ -55,8 +73,9 @@ function wrapUseCase(useCase) {
  * @param {Router} router
  * @param {OpenAPIV3.Document} oasDoc
  * @param {Object} useCases
+ * @param {Object} middleware
  */
-function wrapUseCases(router, oasDoc, useCases) {
+function wrapUseCases(router, oasDoc, useCases, middleware) {
     for (const path of Object.keys(oasDoc.paths)) {
         const pathObject = oasDoc.paths[path];
         for (const key of Object.keys(pathObject)) {
@@ -68,10 +87,20 @@ function wrapUseCases(router, oasDoc, useCases) {
             const operation = pathObject[key];
             const useCase = useCases[operation.operationId];
             if (typeof useCase === "undefined") {
-                // throw new Error(`Could not register operation: ${operation.operationId}`);
+                if (config.general.isTesting) {
+                    console.warn(`Could not register operation: ${operation.operationId}`);
+                } else {
+                    throw new Error(`Could not register operation: ${operation.operationId}`);
+                }
             }
 
-            router[key](path, wrapUseCase(useCase));
+            const handlers = [wrapUseCase(useCase)];
+
+            if (Array.isArray(operation[OPENAPI_X_CHECK_GROUP_ROLE])) {
+                handlers.unshift(middleware.checkGroupRole);
+            }
+
+            router[key](mapPathToExpress(path), ...handlers);
         }
     }
 }
@@ -106,7 +135,7 @@ function registerOpenAPIRoutes(app, oasDoc, { useCases, middleware }) {
     );
 
     const apiRouter = express.Router();
-    wrapUseCases(apiRouter, oasDoc, useCases);
+    wrapUseCases(apiRouter, oasDoc, useCases, middleware);
     app.use("/1.0", apiRouter);
 }
 
