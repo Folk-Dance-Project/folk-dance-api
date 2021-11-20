@@ -1,7 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Test Service
-  description: This is a test service
+  title: Folk Dance Inventory
   version: 1.0.0
 servers:
   - url: /1.0
@@ -162,7 +161,7 @@ paths:
       security:
         - ApiKeyAuth: [ ]
       operationId: getGroupMembers
-      x-check-group-role: [ member ]
+      x-check-group-role: [ ]
   /groups/{groupId}/membership-requests:
     get:
       tags:

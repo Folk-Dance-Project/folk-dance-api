@@ -23,8 +23,6 @@ function RequestMembership({ models }) {
                 status: GROUP_MEMBERSHIP_STATUS.PENDING,
             },
         });
-        group.membersCount += 1;
-        await group.save();
 
         return {
             id: group.id,

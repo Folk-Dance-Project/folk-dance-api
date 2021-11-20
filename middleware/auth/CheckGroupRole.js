@@ -1,5 +1,5 @@
 const { ForbiddenError, UnauthorizedError } = require("../../common/errors");
-const { OPENAPI_X_CHECK_GROUP_ROLE } = require("../../common/constants");
+const { OPENAPI_X_CHECK_GROUP_ROLE, GROUP_MEMBERSHIP_STATUS } = require("../../common/constants");
 
 function CheckGroupRole({ models }) {
     return async function checkGroupRole(req, res, next) {
@@ -9,8 +9,8 @@ function CheckGroupRole({ models }) {
             return;
         }
 
-        const { groupId } = req.query;
-        if (typeof groupId === "undefined") {
+        const groupId = parseInt(req.params.groupId, 10);
+        if (Number.isNaN(groupId)) {
             next();
             return;
         }
@@ -19,14 +19,15 @@ function CheckGroupRole({ models }) {
         if (!user) {
             throw new UnauthorizedError();
         }
-        const hasMembership = await user.hasMembership({
-            where: {
-                id: groupId,
-            },
+        const query = {
+            status: GROUP_MEMBERSHIP_STATUS.APPROVED,
+        };
+        if (requiredRoles.length > 0) {
+            query.role = requiredRoles;
+        }
+        const hasMembership = await user.hasMembership(groupId, {
             through: {
-                where: {
-                    role: requiredRoles,
-                },
+                where: query,
             },
         });
         if (!hasMembership) {

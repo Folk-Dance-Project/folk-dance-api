@@ -56,7 +56,6 @@ describe("RequestMembership", () => {
         };
         group.hasMember = jest.fn();
         group.addMember = jest.fn();
-        group.save = jest.fn();
         models.Groups.findByPk.mockReturnValueOnce(group);
         group.hasMember.mockReturnValueOnce(false);
 
@@ -75,6 +74,5 @@ describe("RequestMembership", () => {
             })
         );
         expect(groupReturned).toEqual(expect.objectContaining({ id: 1 }));
-        expect(group.save).toHaveBeenCalled();
     });
 });

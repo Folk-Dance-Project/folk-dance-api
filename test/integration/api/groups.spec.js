@@ -32,7 +32,7 @@ describe("Groups API", () => {
             const result = await api
                 .post("/1.0/groups")
                 .set("Authorization", "Bearer asd")
-                .send({ name: "test group" });
+                .send({ name: "test group create" });
 
             expect(result.body).toSatisfySchemaInApiSpec("GroupListItem");
             expect(result.status).toBe(200);
@@ -53,7 +53,7 @@ describe("Groups API", () => {
 
     describe("PUT /1.0/groups/{groupId}/membership-requests", () => {
         test("response should match openApi schema", async () => {
-            const group2 = await models.Groups.create({ name: "test group2" });
+            const group2 = await models.Groups.create({ name: "test group join" });
             const result = await api
                 .put(`/1.0/groups/${group2.id}/membership-requests`)
                 .set("Authorization", "Bearer asd");
@@ -64,12 +64,20 @@ describe("Groups API", () => {
     });
     describe("GET /1.0/groups/{groupId}/membership-requests", () => {
         test("response should match openApi schema", async () => {
-            const group3 = await models.Groups.create({ name: "test group2" });
+            const member = await models.Users.create({
+                name: "member",
+                email: "member@example.com",
+                password: "asdasd",
+            });
+            const group3 = await models.Groups.create({ name: "test group get requests" });
             await group3.addMember(1, {
                 through: {
-                    role: GROUP_MEMBERSHIP_ROLES.MEMBER,
-                    status: GROUP_MEMBERSHIP_STATUS.PENDING,
+                    role: GROUP_MEMBERSHIP_ROLES.ADMIN,
+                    status: GROUP_MEMBERSHIP_STATUS.APPROVED,
                 },
+            });
+            await group3.addMember(member.id, {
+                through: { status: GROUP_MEMBERSHIP_STATUS.PENDING },
             });
             const result = await api
                 .get(`/1.0/groups/${group3.id}/membership-requests`)
