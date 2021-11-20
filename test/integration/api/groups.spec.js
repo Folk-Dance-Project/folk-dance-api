@@ -88,4 +88,34 @@ describe("Groups API", () => {
             expect(result.body.members.length).toBeGreaterThan(0);
         });
     });
+    describe("PATCH /1.0/groups/{groupId}/membership-requests", () => {
+        test("response should match openApi schema", async () => {
+            const group = await models.Groups.create({ name: "update test group" });
+            // make current user an admin
+            await group.addMember(1, {
+                through: {
+                    role: GROUP_MEMBERSHIP_ROLES.ADMIN,
+                    status: GROUP_MEMBERSHIP_STATUS.APPROVED,
+                },
+            });
+            // create a membership request
+            const member = await models.Users.create({
+                name: "member",
+                email: "member@example.com",
+                password: "asdasd",
+            });
+            await group.addMember(member.id);
+            const result = await api
+                .patch(`/1.0/groups/${group.id}/membership-requests`)
+                .set("Authorization", "Bearer asd")
+                .send({
+                    userId: member.id,
+                    status: GROUP_MEMBERSHIP_STATUS.APPROVED,
+                    role: GROUP_MEMBERSHIP_ROLES.MEMBER,
+                });
+
+            expect(result.body).toSatisfySchemaInApiSpec("GroupListItem");
+            expect(result.status).toBe(200);
+        });
+    });
 });

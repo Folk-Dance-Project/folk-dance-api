@@ -350,7 +350,7 @@ components:
         status:
           type: string
           enum:
-            - accepted
+            - approved
             - pending
             - denied
         role:

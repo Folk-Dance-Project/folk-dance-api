@@ -9,6 +9,7 @@ const CreateGroup = require("../use-cases/groups/CreateGroup");
 const GetGroupMembers = require("../use-cases/groups/GetGroupMembers");
 const GetMembershipRequests = require("../use-cases/groups/GetMembershipRequests");
 const RequestMembership = require("../use-cases/groups/RequestMembership");
+const UpdateMembershipRequest = require("../use-cases/groups/UpdateMembershipRequest");
 
 function configureUseCases({ models, services }) {
     const register = Register({ models, jwt: services.jwt });
@@ -18,6 +19,7 @@ function configureUseCases({ models, services }) {
     const getGroupMembers = GetGroupMembers({ models });
     const getMembershipRequests = GetMembershipRequests({ models });
     const requestMembership = RequestMembership({ models });
+    const updateMembershipRequest = UpdateMembershipRequest({ models });
 
     return {
         register,
@@ -27,6 +29,7 @@ function configureUseCases({ models, services }) {
         getGroupMembers,
         getMembershipRequests,
         requestMembership,
+        updateMembershipRequest,
     };
 }
 
