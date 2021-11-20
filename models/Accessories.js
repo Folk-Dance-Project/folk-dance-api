@@ -26,14 +26,14 @@ class Accessories extends Model {
                     allowNull: true,
                     get() {
                         try {
-                            return JSON.parse(this.metadata);
+                            return JSON.parse(this.getDataValue("metadata"));
                         } catch (e) {
                             console.error("Could not parse metadata for accessory:", this.id);
                             return null;
                         }
                     },
                     set(value) {
-                        this.metadata = JSON.stringify(value);
+                        this.setDataValue("metadata", JSON.stringify(value));
                     },
                 },
             },

@@ -7,6 +7,7 @@ servers:
 tags:
   - name: Auth
   - name: Groups
+  - name: Accessories
 paths:
   /auth/register:
     post:
@@ -260,6 +261,48 @@ paths:
         - ApiKeyAuth: [ ]
       operationId: updateMembershipRequest
       x-check-group-role: [ admin ]
+
+  /groups/{groupId}/accessories:
+    get:
+      tags:
+        - Accessories
+      description: Get accessories defined within a group
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        200:
+          description: A list of accessories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessoriesList'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+      operationId: getAccessories
+      security:
+        - ApiKeyAuth: [ ]
+      x-check-group-role: [ ]
+
 components:
   securitySchemes:
     ApiKeyAuth:
@@ -269,6 +312,50 @@ components:
       bearerFormat: JWT
 
   schemas:
+    Accessory:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - name
+        - metadata
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: Csizma
+        metadata:
+          type: array
+          maxLength: 100
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - name
+              - type
+            properties:
+              name:
+                type: string
+                example: Méret
+              type:
+                type: string
+                enum:
+                  - number
+                  - text
+    AccessoriesList:
+      type: object
+      additionalProperties: false
+      required:
+        - total
+        - accessories
+      properties:
+        total:
+          type: integer
+        accessories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Accessory'
     GroupListItem:
       type: object
       additionalProperties: false
@@ -406,9 +493,3 @@ components:
       properties:
         token:
           type: string
-
-
-
-
-
-
