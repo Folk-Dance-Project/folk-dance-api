@@ -302,6 +302,39 @@ paths:
       security:
         - ApiKeyAuth: [ ]
       x-check-group-role: [ ]
+    post:
+      tags:
+        - Accessories
+      description: Create an accessory
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccessoryBody'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accessory'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+      security:
+        - ApiKeyAuth: [ ]
+      operationId: createAccessory
+      x-check-group-role: [ admin ]
 
 components:
   securitySchemes:
@@ -370,6 +403,34 @@ components:
           type: string
         membersCount:
           type: integer
+    CreateAccessoryBody:
+      type: object
+      additionalProperties: false
+      required:
+        - name
+        - metadata
+      properties:
+        name:
+          type: string
+          example: Csizma
+        metadata:
+          type: array
+          maxLength: 100
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - name
+              - type
+            properties:
+              name:
+                type: string
+                example: Méret
+              type:
+                type: string
+                enum:
+                  - number
+                  - text
     GroupList:
       type: object
       additionalProperties: false

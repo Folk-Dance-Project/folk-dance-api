@@ -38,4 +38,27 @@ describe("Accessories API", () => {
             expect(result.body.total).toBeGreaterThan(0);
         });
     });
+
+    describe("POST /1.0/groups/{groupId}/accessories", () => {
+        test("response should match openApi schema", async () => {
+            const user = await models.Users.findByPk(1);
+            // make current user admin
+            await user.addMembership(1, { through: { role: GROUP_MEMBERSHIP_ROLES.ADMIN } });
+
+            const result = await api
+                .post("/1.0/groups/1/accessories")
+                .set("Authorization", "Bearer asd")
+                .send({
+                    name: "test",
+                    metadata: [
+                        { name: "size", type: "number" },
+                        { name: "note", type: "text" },
+                    ],
+                });
+
+            expect(result.body).toSatisfySchemaInApiSpec("Accessory");
+            expect(result.status).toBe(200);
+            expect(typeof result.body.id).toBe("number");
+        });
+    });
 });
