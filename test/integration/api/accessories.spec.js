@@ -61,4 +61,20 @@ describe("Accessories API", () => {
             expect(typeof result.body.id).toBe("number");
         });
     });
+
+    describe("DELETE /1.0/groups/{groupId}/accessories/{id}", () => {
+        test("response should match openApi schema", async () => {
+            const user = await models.Users.findByPk(1);
+            // make current user admin
+            await user.addMembership(1, { through: { role: GROUP_MEMBERSHIP_ROLES.ADMIN } });
+
+            const result = await api
+                .delete("/1.0/groups/1/accessories/1")
+                .set("Authorization", "Bearer asd");
+
+            expect(result.body).toSatisfySchemaInApiSpec("Accessory");
+            expect(result.status).toBe(200);
+            expect(typeof result.body.id).toBe("number");
+        });
+    });
 });

@@ -12,6 +12,7 @@ const RequestMembership = require("../use-cases/groups/RequestMembership");
 const UpdateMembershipRequest = require("../use-cases/groups/UpdateMembershipRequest");
 const GetAccessories = require("../use-cases/accessories/GetAccessories");
 const CreateAccessory = require("../use-cases/accessories/CreateAccessory");
+const DeleteAccessory = require("../use-cases/accessories/DeleteAccessory");
 
 function configureUseCases({ models, services }) {
     const register = Register({ models, jwt: services.jwt });
@@ -24,6 +25,7 @@ function configureUseCases({ models, services }) {
     const updateMembershipRequest = UpdateMembershipRequest({ models });
     const getAccessories = GetAccessories({ models });
     const createAccessory = CreateAccessory({ models });
+    const deleteAccessory = DeleteAccessory({ models });
 
     return {
         register,
@@ -36,6 +38,7 @@ function configureUseCases({ models, services }) {
         updateMembershipRequest,
         getAccessories,
         createAccessory,
+        deleteAccessory,
     };
 }
 

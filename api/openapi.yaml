@@ -335,7 +335,39 @@ paths:
         - ApiKeyAuth: [ ]
       operationId: createAccessory
       x-check-group-role: [ admin ]
-
+  /groups/{groupId}/accessories/{id}:
+    delete:
+      tags:
+        - Accessories
+      description: Delete an accessory
+      parameters:
+        - name: groupId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: The deleted accessory
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accessory'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIError'
+      operationId: deleteAccessory
+      security:
+        - ApiKeyAuth: [ ]
+      x-check-group-role: [ admin ]
 components:
   securitySchemes:
     ApiKeyAuth:
