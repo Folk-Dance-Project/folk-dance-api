@@ -3,6 +3,7 @@ const jsyaml = require("js-yaml");
 const fs = require("fs");
 const { StatusCodes } = require("http-status-codes");
 
+const cors = require("cors");
 const registerOpenAPIRoutes = require("./api/registerOpenAPIRoutes");
 const { NotFoundError } = require("./common/errors");
 const errorHandler = require("./middleware/errorHandler");
@@ -19,6 +20,7 @@ class Application {
 
     setupMiddleware() {
         this.app.disable("x-powered-by");
+        this.app.use(cors());
         this.app.use(
             express.json({
                 limit: "50mb",
